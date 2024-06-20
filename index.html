@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookie Clicker Heavenly Chips Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f3f3f3;
+            color: #333;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input[type="file"] {
+            margin: 20px 0;
+        }
+        .output {
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+        .note {
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cookie Clicker Heavenly Chips Calculator</h1>
+        <input type="file" id="saveFileInput" accept=".txt" />
+        <div class="output" id="output"></div>
+        <div class="note">
+            <p>This tool is not affiliated with DashNet, Orteil, or Opti. It is for educational purposes only.</p>
+        </div>
+    </div>
+
+    <script>
+        function parseSaveFile(fileContent) {
+            // Assuming the cookies count is found in the file as 'cookiesEarned='
+            const cookiesRegex = /cookiesEarned=([\d.e+-]+)/;
+            const match = fileContent.match(cookiesRegex);
+            if (match) {
+                const cookies = parseLargeNumber(match[1]);
+                return cookies;
+            }
+            return 0;
+        }
+
+        function parseLargeNumber(numberStr) {
+            // Parsing large numbers in scientific notation
+            return parseFloat(numberStr);
+        }
+
+        function calculateHeavenlyChips(cookies) {
+            // Basic calculation for heavenly chips
+            return Math.floor(Math.sqrt(2.5 * (cookies / 1e12)) - 2);
+        }
+
+        function formatNumber(number) {
+            if (number >= 1e12) return (number / 1e12).toFixed(2) + 'T';
+            if (number >= 1e9) return (number / 1e9).toFixed(2) + 'B';
+            if (number >= 1e6) return (number / 1e6).toFixed(2) + 'M';
+            if (number >= 1e3) return (number / 1e3).toFixed(2) + 'K';
+            return number;
+        }
+
+        document.getElementById('saveFileInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const fileContent = e.target.result;
+                    const cookies = parseSaveFile(fileContent);
+                    const heavenlyChips = calculateHeavenlyChips(cookies);
+                    document.getElementById('output').innerHTML = `
+                        <p>Cookies: ${formatNumber(cookies)}</p>
+                        <p>Heavenly Chips: ${heavenlyChips}</p>
+                    `;
+                };
+                reader.readAsText(file);
+            }
+        });
+    </script>
+</body>
+</html>
