@@ -47,14 +47,25 @@
 
     <script>
         function parseSaveFile(fileContent) {
-            // Assuming the cookies count is found in the file as 'cookiesEarned='
-            const cookiesRegex = /cookiesEarned=([\d.e+-]+)/;
-            const match = fileContent.match(cookiesRegex);
+            // Regular expressions to match different versions of save file structure
+            const webVersionRegex = /cookies=\{(?:[^{}]|{(?:[^{}]|{[^{}]*})*})*?cookies:(\d+),/s;
+            const androidVersionRegex = /cookiesEarned=([\d.e+-]+)/;
+            
+            let cookies = 0;
+            
+            // Attempt to parse based on web version structure
+            let match = fileContent.match(webVersionRegex);
             if (match) {
-                const cookies = parseLargeNumber(match[1]);
-                return cookies;
+                cookies = parseInt(match[1]);
+            } else {
+                // Fallback to Android version structure
+                match = fileContent.match(androidVersionRegex);
+                if (match) {
+                    cookies = parseLargeNumber(match[1]);
+                }
             }
-            return 0;
+            
+            return cookies;
         }
 
         function parseLargeNumber(numberStr) {
@@ -64,7 +75,7 @@
 
         function calculateHeavenlyChips(cookies) {
             // Basic calculation for heavenly chips
-            return Math.floor(Math.sqrt(2.5 * (cookies / 1e12)) - 2);
+            return Math.max(0, Math.floor(Math.sqrt(2.5 * (cookies / 1e12)) - 2));
         }
 
         function formatNumber(number) {
@@ -72,7 +83,7 @@
             if (number >= 1e9) return (number / 1e9).toFixed(2) + 'B';
             if (number >= 1e6) return (number / 1e6).toFixed(2) + 'M';
             if (number >= 1e3) return (number / 1e3).toFixed(2) + 'K';
-            return number;
+            return number.toString();
         }
 
         document.getElementById('saveFileInput').addEventListener('change', function(event) {
